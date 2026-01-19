@@ -1,4 +1,4 @@
-# ECON 448: Population and Development
+# ECON 448: Comparative Economic Development
 **University of Washington | Autumn 2025**
 **Author:** Ching-Wei (Alex) Lin
 
@@ -15,5 +15,7 @@ This repository contains the complete coursework and final research project for 
 
 ## Data Sources
 The primary datasets used in this project and coursework are sourced from **IPUMS (Integrated Public Use Microdata Series)**. 
+
+* **IPUMS Website:** [https://www.ipums.org/](https://www.ipums.org/)
 
 > **Note on Data Privacy:** To comply with GitHub file size limits and data provider terms, raw data files (including `.csv` and `.gz` formats) are excluded from this repository via `.gitignore`. The code provided includes the necessary steps to process these files once they are acquired from the original source.
