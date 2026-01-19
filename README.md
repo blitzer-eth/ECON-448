@@ -11,7 +11,6 @@ This repository contains the complete coursework and final research project for 
 
 ## Coursework Contents
 * **Problem Sets 1-4:** A series of econometrics and data analysis assignments focused on comparative development indicators.
-* **First Week Exercises:** Introductory R scripts covering data cleaning and visualization basics.
 
 ## Data Sources
 The primary datasets used in this project and coursework are sourced from **IPUMS (Integrated Public Use Microdata Series)**. 
