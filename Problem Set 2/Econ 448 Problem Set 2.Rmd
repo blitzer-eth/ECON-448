@@ -1,0 +1,51 @@
+---
+title: "Econ 448"
+author: "Alex Lin"
+date: "`r format(Sys.time(), '%m/%d/%Y')`"
+output:
+  html_document:
+    df_print: paged
+subtitle: Problem Set 2
+---
+## Concept Questions
+
+1. A household derives utility from the number of children n and consumption c according to the utility function
+$U(z,n)=z^α n^β$    (where $α+β=1$)
+The income of the household is Y and the price of children is pn. With the price of consumption set equal to one the household’s budget constraint is
+$I=p_n n+p_z z$
+
+- 1.1 Calculate the utility maximizing demand for children as a function of income and      prices. How does the demand for children change as I increases in this model? How would the demand for children change as preferences for children increase (that is, as β gets larger)?
+
+Answer:
+
+With Cobb–Douglas utility $U(z, n)=z^{\alpha} n^{\beta}$ and ($\alpha+\beta=1$), a family consumes a fixed proportion ($\beta$) of income on children. With the budget ($I=p_n n+z$) (price of (z) is 1), the demand for children is $n^*(I,p_n)=\frac{\beta I}{p_n}$. So the number of children rises one-for-one with income (income elasticity = 1), and it falls when the price per child ($p_n$) rises. As the taste of children becomes more popular ($\beta$ increases), the share of child spending goes up and ($n^*$) rises at all levels of income and prices.
+
+- Now replace I with $Y+L*w$, where Y is male income, $L*w$ is female wage income, and $L=T-k*n$.  T is the total number of hours in the day and $k*n$ is the total amount of time that women spend raising their n children.  
+
+Answer:
+
+Let total income be ($I=Y+Lw$) where ($L=T-kn$). That is, woman's labor income is ($w$) per hour multiplied by hours available to her, and ($k$) hours per child is taken by each. Then $I = Y + (T - kn)w$.
+
+Inserting into the goods budget, $z = I - p_n n = Y + Tw - (p_n + kw),n$.
+
+Every extra child reduces consumption by both the explicit cost ($p_n$) and mother's foregone wage ($kw$).
+
+- 1.2 Rearrange terms to get a new price of children, $p_n^*$, which includes both explicit     and opportunity costs of children.  How does this price vary with the woman’s wage?
+  
+Answer:
+
+Define the “full” price of a child as $p_n^* \equiv p_n + k w$, which adds the time cost valued at the woman’s wage. This price increases linearly with ($w$) at slope ($k$); the higher wages, the more expensive each child is per unit of time spent.
+
+- Now find the household’s demand for children as a function of this new price, $p_n^*$.     (Hint: You may substitute $p_n^*$ for $p_n$ and $Y+Tw$ for I if you don’t want to           explicitly re-solve the problem.)  How does the demand for children vary with w now?      Why do we say that the effect of a female wage increase on fertility is ambiguous?
+	  
+Answer:
+
+Treating full income as ($Y+Tw$) and the child price as ($p_n^*$), the same Cobb–Douglas logic gives $n^*(w)=\frac{\beta (Y+Tw)}{p_n + kw}$.
+
+Raising ($w$) raises income (the numerator) and thus increases fertility but raises the opportunity cost per child (the denominator) and consequently decreases fertility. Because the income and substitution effects move in opposite directions, theoretically the net effect of a rise in the woman's wage on fertility is ambiguous.
+
+2. Why would an estimate of the effect of contraceptive use on a woman's fertility potentially be biased?  How does Miller use a natural experiment to remove this bias?  In your answer, define the natural experiment and discuss how the natural experiment satisfies the "exclusion restriction" for the bias you described in the first part of this question.
+
+Answer:
+
+This is a typical case of a biased comparison since the use of contraceptives is not random. The users may have heterogeneous unobserved tastes for children, fecundity, schooling, or access to healthcare and these variables affect fertility as well. There is reverse causality too (women expecting higher fertility will use contraception). Miller settles this with a natural experiment: staggered, quasi-idiosyncratic implementation of family-planning clinics created plausibly exogenous variation in access to modern contraception across space and time. Instrumenting clinic access on fertility (or a differences-in-differences design with fixed effects), he eliminates the part of contraceptive availability not caused by local child desire. Exclusion restriction is that clinic rollout affects births indirectly via access and prices to contraceptives, but not directly in other routes. He verifies this with timing/place controls, pre-trend checks, and tests showing that the rollout was not aimed at underlying fertility intentions.

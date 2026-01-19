@@ -1,0 +1,205 @@
+---
+title: "Econ 448 Problem Set 1"
+author: "Alex Lin"
+date: "`r format(Sys.time(), '%m/%d/%Y')`"
+output:
+  html_document:
+    df_print: paged
+subtitle: Check Canvas for Due Date
+---
+
+This is the first problem set for Econ 448.  In it, you will answer a mix of questions that require both conceptual and analysis work.  **I prefer that you submit your entire document as one html document generated from your Markdown Notebook.** However, you may answer the concept and calculation questions separately in the word processor of your choice (converted to pdf), but please submit your code and results for any of the data analysis questions as a pdf or html file. 
+
+Please install any necessary packages, but only once. If you are working in the class RStudio server, you should not need to do this. 
+
+```{r message=FALSE, warning=FALSE}
+## Load every time, but only once per session 
+library("ggplot2")
+library("dplyr")
+library("HMDHFDplus")
+library(readr)
+```
+
+
+### Conceptual Questions
+Note: These questions are designed to help you think about the issues raised in this class, rather than to have a "right" or "wrong" answer.
+
+1. It took Finland about 50 years to go through its demographic transition around the turn of the 20th century.  For this question, go to populationpyramid.net, choose a country in Asia, Africa, or Central or South America that is currently in the third stage or later of its demographic transition.  Look back in time to find a year in which it was in the second stage.  Then figure out approximately how many years it took the country to enter the third stage  In your answer, tell me: Name of the country, year it was in the second stage, years to third stage.  Did this country take more or less time than Finland.  Try to think of at least two reasons why that might be the case and write a short description of your reasoning. Note: If you can't find when the country was in its second stage, look for a different country.
+
+A:
+Thailand was at stage two in 1970 and reached stage three in 1977, thus taking seven years. Finland proceeded from stage two to stage three in the years 1952 and 1954, approximately two years. Thailand hence took more time than Finland to perform the same action.
+
+Two reasons are possible for the difference. Then, Thailand's fertility decline was behind: family size desired was larger throughout the early 1970s, and while family planning programs grew incredibly fast later in the decade, the takeoff did not follow until a pair of years of successive high births. Finland, working in post-war Europe, experienced earlier diffusion of contraception, maternal/child health care, and social policy that introduced falling mortality and more rapid fertility declines earlier. Secondly, Thailand was more rural and agricultural in 1970 compared to Finland in the early 1950s. Gradually faster urbanization and improved schooling of girls would normally cause the transition from Stage 2 to Stage 3 to occur later, while Finland's faster structural transformation, larger proportion of non-agricultural employment, more female schooling, and delayed marriage shortened its transition span.
+
+2. The Millennium Development Goals (https://www.who.int/news-room/fact-sheets/detail/millennium-development-goals-(mdgs)) were 8 goals set forth by the United Nations in the late 1990s that were meant to serve as a framework for reducing extreme poverty along multiple dimensions by 2015. Consult the file "africa-millennium-development-goals.xlsx" found in github or at https://data.humdata.org/dataset/africa-millennium-development-goals. Choose one goal and two countries. State the goal, the countries, the measures used to assess progress in the goal, and compare and contrast the progress of the two countries toward achieving that goal.  
+
+A:
+Goal 4: Reduce child mortality
+Countries: Kenya and Ghana.
+Measures used: (1) Under-five mortality rate (deaths per 1,000 live births), (2) Proportion of 1-year-olds immunised against measles (%).
+
+According to the cleanest common series under-five mortality rate, Kenya fell from 151 (1990) to 119 (2007), by 32 per 1,000 (≈–21%). The trend was not monotonic, mortality worsened through the mid-1990s (peaking ~197 in 1996) before rebounding sharply as of 2007. Kenya's immunization against measles rose from 77% (1992) to 91% (1998), then fell to ~85% by 2007, net gain but with late-period slippage. Ghana under-five mortality decreased from 120 (1990) to 80 (2008), a fall of 40 per 1,000 (≈–33%), more consistent long-run improvement. In the series of immunisation which you cut, Ghana only shows 61% in 1990 (no later points in this extract), so that the mortality series is the sensible basis for comparison.
+
+Comparison: Both countries progressed considerably toward MDG 4, yet Ghana's relative decrease in under-five mortality (≈–33%) outpaced that of Kenya's (≈–21%) over the period reflected in your data. Measles gains in coverage in Kenya earlier may have led to follow-up mortality reductions, but mid-1990s falls (e.g., general health-system or disease-burden shocks) slowed its net decline. Ghana’s smoother mortality trajectory suggests more consistent improvements in child-survival determinants (immunisation campaigns, primary care, malaria control, nutrition/water/sanitation), though we’d need fuller immunisation data to confirm how much measles coverage contributed there.
+
+
+### Calculation Questions (show your work or include your code)
+3. You are a young RA working at the World Bank.  It’s 4:55 and your boss just came into your cubicle to tell you that he has a meeting at 8 am to discuss new anti-poverty strategies in the fictional country of Portlandia.  He hands you the following information and asks for a poverty profile.  Oh, and he has a tennis game in 20 minutes, so could you include some policy recommendations and have the report on his desk by the morning?  
+
+    The paper he hands you says:
+      
+      Portlandia is a small, poor country where the people are divided into four equal sized groups consisting of 
+      1000 people each.  One group earns $100 a year, one earns $500 a year, one earns $900 a year, and the final 
+      group earns $1500 a year.  The poverty line is set at $1000.  We have a budget of $300,000 for poverty      
+      alleviation. 
+
+    3.1 Please calculate the Head Count Ratio, and Income Gap Ratio for this country. (Include code, but this could
+    just be simple calculations.)
+```{r}
+# 3.1
+z <- 1000
+group_size <- 1000
+incomes <- c(100, 500, 900, 1500)
+n_groups <- length(incomes)
+n <- n_groups * group_size
+
+poor <- incomes[incomes < z]
+q <- length(poor) * group_size
+
+HCR <- q / n  # Head Count Ratio
+# Income Gap Ratio
+IGR <- mean((z - poor) / z)
+
+#Poverty Gap Index (population-normalized)
+PGI <- (sum((z - poor) / z) * group_size) / n
+
+HCR; IGR; PGI
+```
+    
+    3.2	The World Bank’s policy is to minimize head count ratio.  What will your recommendation be?  What will the 
+    new head count ratio be? (Include code)
+```{r}
+# 3.2
+budget <- 300000
+
+gap_per_person <- pmax(0, z - incomes)
+
+ord <- order(gap_per_person)
+gaps_sorted <- gap_per_person[ord]
+sizes_sorted <- rep(group_size, length(gaps_sorted))
+
+lifted <- 0
+remaining_budget <- budget
+lifted_by_group <- rep(0, length(gaps_sorted))
+
+for (i in seq_along(gaps_sorted)) {
+  gap_i <- gaps_sorted[i]
+  if (gap_i == 0) next
+  can_lift <- min(sizes_sorted[i], floor(remaining_budget / gap_i))
+  lifted <- lifted + can_lift
+  lifted_by_group[i] <- can_lift
+  remaining_budget <- remaining_budget - can_lift * gap_i
+}
+
+initial_poor <- sum(incomes < z) * group_size
+new_poor <- initial_poor - lifted
+new_HCR <- new_poor / n
+
+list(lifted_total = lifted,
+     new_headcount = new_poor,
+     new_HCR = new_HCR,
+     remaining_budget = remaining_budget,
+     lifted_per_group_in_sorted_order = lifted_by_group,
+     gaps_sorted = gaps_sorted)
+```
+    
+    3.3 Do you think this is the correct approach to poverty alleviation?  Why or why not? 
+    
+    A:
+    Not necessarily, at least not by itself. Cutting headcount only removes the number of poor persons below the line and does not address depth and intensity of      poverty. It creates a strong incentive to target the near-poor (e.g., $900) as they are lowest-cost to get above the line, bypassing the ultra-poor (e.g.,         $100)—though more disadvantaged. It can also be susceptible to being cut if incomes drop below the line again next year.
+    
+    Better: Anchor headcount to depth/severity indicators—e.g., close the poverty gap (PGI) or the square gap (FGT(2))—and top up cash transfers with structural       interventions (health, education, water/sanitation, access to work) boosting permanent incomes and resilience. A tiered policy can put some of the ultra-poor      budget aside but can still achieve considerable headcount reductions.
+    
+
+4. Calculate Total Fertility Rates
+The female population (in thousands) and births by mother's age group in Brazil in 2005 are in the table below. (The first chunk is the data, the second is there to display it nicely.) Use this data to calculate the Total Fertility Rate for Brazil at this time.
+```{r}
+fertility <-as.data.frame(matrix(c(8128,8531,8844, 8118, 7209, 6715, 6409,367.9,530.2,449.6, 264.4, 126.5, 38.4, 6.8), nrow=7, ncol=2, dimnames=list(c("15-19","20-24","25-29","30-34","35-39","40-44","45-49"), c("Population_Thousands","Births_Thousands"))))
+fertility
+```
+
+```{r}
+ages <- c("15-19","20-24","25-29","30-34","35-39","40-44","45-49")
+pop_thou <- c(8128,8531,8844,8118,7209,6715,6409)        # women
+births_thou <- c(367.9,530.2,449.6,264.4,126.5,38.4,6.8) # births
+
+fertility <- data.frame(Age=ages,
+                        Population_Thousands=pop_thou,
+                        Births_Thousands=births_thou)
+
+fertility$ASFR <- (fertility$Births_Thousands / fertility$Population_Thousands) # births per woman
+TFR <- 5 * sum(fertility$ASFR)
+
+fertility
+TFR
+```
+TFR ≈ 1.076 children per woman
+
+### Data Questions (include your code)
+5. For this question, we will practice reading in some real data from the Human Mortality Database at UC Berkeley.  Follow the steps in the lab to get an account and access the data you need.
+
+  Modify the code in the lab exercise above to calculate and then   plot the *Age Specific Mortality Rates* for a single year for     a country other than the US.  (Note: The list of countries is here https://www.mortality.org/Data/DataAvailability. They are mostly western countries, and I recommend picking a               Scandinavian country to get a long and more interesting time series.)
+
+  Hint: Rather than aggregating over all deaths, you are going to filter the data for one year only, then calculate ASMR for that year. 
+  
+```{r}
+## Q5)
+myname  <- "chingl6@uw.edu"
+mypass  <- "Abc123!"
+country <- "SWE"
+year_chosen <- 2019
+
+deaths_1x1 <- readHMDweb(CNTRY = country, item = "Deaths_1x1",
+                         username = myname, password = mypass)
+expo_1x1   <- readHMDweb(CNTRY = country, item = "Exposures_1x1",
+                         username = myname, password = mypass)
+
+d_y <- deaths_1x1 %>%
+  filter(Year == year_chosen) %>%
+  select(Age, Deaths_Total = Total)
+
+e_y <- expo_1x1 %>%
+  filter(Year == year_chosen) %>%
+  select(Age, Exposure_Total = Total)
+
+asmr <- d_y %>%
+  inner_join(e_y, by = "Age") %>%
+  mutate(
+    Age_num = as.numeric(gsub("\\+", "", as.character(Age))),
+    ASMR = Deaths_Total / Exposure_Total,
+    ASMR_per_1000 = ASMR * 1000
+  )
+
+head(asmr)
+
+ggplot(asmr, aes(x = Age_num, y = ASMR_per_1000)) +
+  geom_line() +
+  labs(
+    title = paste0("Age-Specific Mortality Rates (", country, ", ", year_chosen, ")"),
+    x = "Age", y = "ASMR per 1,000 person-years"
+  )
+```
+
+6. Using the data you downloaded for problem 5, calculate the crude mortality rate for the country and year chosen.
+
+```{r}
+## Q6)
+total_deaths   <- sum(asmr$Deaths_Total,   na.rm = TRUE)
+total_exposure <- sum(asmr$Exposure_Total, na.rm = TRUE)
+
+CMR <- total_deaths / total_exposure
+CMR_per_1000 <- CMR * 1000
+
+CMR; CMR_per_1000
+
+```

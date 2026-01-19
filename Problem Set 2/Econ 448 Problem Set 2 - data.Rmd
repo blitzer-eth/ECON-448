@@ -1,0 +1,68 @@
+---
+title: "Econ 448"
+subtitle: "Problem Set 2 - Data Analysis"
+author: Alex Lin
+date: "`r format(Sys.time(), '%m/%d/%Y')`"
+output: html_notebook  
+---
+
+## Data Analysis Questions
+3. These questions refer to the data set "1% sample Botswana ever-married women age 15+" available via the Econ 448 class account from ipums.org (class code is W0NV72).  Please create an account, download the data and answer the following questions.
+```{r}
+library(ipumsr)
+library(dplyr)
+library(ggplot2)
+library(stargazer)
+
+# Adjust to your folder if needed
+setwd("C:/IPUMS")
+
+ddi <- read_ipums_ddi("ipumsi_00009.xml")
+df_raw <- read_ipums_micro(ddi, data_file = "ipumsi_00009.dat.gz")
+```
+
+3.1 Create a formatted table of summary statistics (mean, std dev, max, min) for all variables that you use in your analysis (Hint: wait until you answer all of the other questions before finalizing this part so you know what variables you will use).
+```{r}
+vars_used <- c("CHBORN", "YRSCHOOL", "AGE", "YRSCHOOL_SP")  # + RELIGION_F (categorical)
+stargazer(
+  df[vars_used],
+  type = "text",
+  summary.stat = c("n","mean","sd","min","max"),
+  title = "Summary Statistics (Analysis Sample)"
+)
+```
+
+3.2 Plot mean number of children against mean years of education. What relationship do you see between these data and what does that tell you about what output you would expect from a regression?
+```{r}
+df_means <- df %>%
+  group_by(YRSCHOOL) %>%
+  summarise(CHBORN_mean = mean(CHBORN), .groups = "drop")
+
+ggplot(df_means, aes(x = YRSCHOOL, y = CHBORN_mean)) +
+  geom_point() +
+  geom_smooth(method = lm, formula = y ~ x) +
+  labs(x = "Years of schooling (woman)", y = "Mean children ever born",
+       title = "Mean CHBORN vs. Woman's Education (Botswana 1% sample)")
+```
+The relationship is negative: higher schooling is associated with fewer children.
+Therefore we expect a negative slope in an OLS regression of CHBORN on YRSCHOOL.
+
+3.3 Using the main data frame, use ordinary least squares to estimate the coefficient $\beta_1$ in the regression model $Y_i=\beta_0+\beta_1X_i+\epsilon_i$, where Y is children ever born and X is a woman's education.  Show your results. Does the sign match what you expect to see? Note: Typically, we might transform the data, perhaps by taking the log of children, or use a non-linear regression such as a Poisson regression here.  However, the zeros make this a little more complicated.  
+```{r}
+m1 <- lm(CHBORN ~ YRSCHOOL, data = df)
+stargazer(m1, type = "text", title = "OLS: CHBORN ~ YRSCHOOL (baseline)")
+```
+
+3.4 Now let's add some control variables.  Choose at least two control variables from the available variables in the data.  What variables did you choose and what sign do you expect the coefficients on these variables to have? Why? 
+
+AGE           → expected + (older women had more time to have births)
+YRSCHOOL_SP   → expected − (spousal education often lowers fertility)
+RELIGION_F    → dummies (direction is empirical; include to avoid linear-coding bias)
+
+3.5 Add these variables to your regression model from the previous question and display your results.  (Be careful that you understand the structure of the variables you have chosen and "clean" them as needed before including in your model.) Do the coefficients match your expectations?  Does the coefficient on education change once you add the control variables?
+```{r}
+m2 <- lm(CHBORN ~ YRSCHOOL + AGE + YRSCHOOL_SP + RELIGION_F, data = df)
+stargazer(m1, m2, type = "text",
+          column.labels = c("Baseline", "+ Controls"),
+          title = "Effect of Adding Controls on Education Coefficient")
+```

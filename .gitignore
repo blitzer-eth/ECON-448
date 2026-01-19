@@ -1,0 +1,5 @@
+ipumsi_00004.csv.gz
+*.csv
+*.gz
+*.xlsx
+*.zip
